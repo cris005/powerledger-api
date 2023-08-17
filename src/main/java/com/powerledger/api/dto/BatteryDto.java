@@ -1,10 +1,8 @@
 package com.powerledger.api.dto;
 
-
 import com.powerledger.api.annotation.Postcode;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 
 import java.time.Instant;
 import java.util.UUID;

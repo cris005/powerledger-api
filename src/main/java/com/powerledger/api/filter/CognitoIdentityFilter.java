@@ -1,6 +1,5 @@
 package com.powerledger.api.filter;
 
-
 import com.amazonaws.serverless.proxy.RequestReader;
 import com.amazonaws.serverless.proxy.model.AwsProxyRequestContext;
 

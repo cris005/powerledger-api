@@ -6,7 +6,9 @@ import com.powerledger.api.repository.BatteryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class BatteryService {
@@ -35,15 +37,11 @@ public class BatteryService {
 
     }
 
-    public Iterable<BatteryDto> ListBatteries(String min, String max) {
-        var batteries = this.batteryRepository.findAllByPostcodeBetweenOrderByNameAsc(min, max);
+    public List<BatteryDto> ListBatteries(String min, String max) {
+        List<Battery> batteries = this.batteryRepository.findAllByPostcodeBetweenOrderByNameAsc(min, max);
 
-        var batteryDtoList = new ArrayList<BatteryDto>();
-
-        for (Battery battery : batteries) {
-            batteryDtoList.add(battery.asDto());
-        }
-
-        return batteryDtoList;
+        return batteries.stream()
+                .map(Battery::asDto)
+                .toList();
     }
 }

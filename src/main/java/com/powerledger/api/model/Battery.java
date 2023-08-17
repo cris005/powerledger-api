@@ -1,6 +1,5 @@
 package com.powerledger.api.model;
 
-
 import com.powerledger.api.dto.BatteryDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

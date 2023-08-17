@@ -1,8 +1,8 @@
 package com.powerledger.api.controller;
 
-
 import com.powerledger.api.annotation.Postcode;
 import com.powerledger.api.dto.BatteryDto;
+import com.powerledger.api.response.BatteriesListResponse;
 import com.powerledger.api.service.BatteryService;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.*;
-
 
 @RestController
 @EnableWebMvc
@@ -43,7 +42,7 @@ public class BatteriesController {
     }
 
     @GetMapping("/batteries")
-    ResponseEntity<Iterable<BatteryDto>> listBatteries(
+    ResponseEntity<BatteriesListResponse> listBatteries(
             @RequestParam("minPostcode") Optional<@Postcode(optional = true) String> minPostcode,
             @RequestParam("maxPostcode") Optional<@Postcode(optional = true) String> maxPostcode) {
 
@@ -51,26 +50,14 @@ public class BatteriesController {
             throw new ConstraintViolationException("Min. postcode must be lesser than max postcode", null);
         }
 
-        var batteries = batteryService.ListBatteries(
-                minPostcode.orElse("0"),
-                maxPostcode.orElse("9999")
+        List<BatteryDto> batteries = batteryService.ListBatteries(
+            minPostcode.orElse("0"),
+            maxPostcode.orElse("9999")
         );
 
-        int totalBatteries = 0;
-        int totalCapacity = 0;
-        for (BatteryDto battery : batteries)
-        {
-            totalCapacity += battery.getCapacity();
-            totalBatteries++;
-        }
-        log.info("Count: " + totalBatteries);
-        log.info("Total capacity: " + totalCapacity);
-
-        int averageCapacity = totalCapacity / totalBatteries;
-        log.info("Average capacity: " + averageCapacity);
-
+        BatteriesListResponse response = makeBatteriesListResponse(batteries);
         log.info("Successfully fetched a Batteries list");
-        return ResponseEntity.ok(batteries);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/batteries/{batteryId}")
@@ -91,5 +78,19 @@ public class BatteriesController {
 
         // If min is lesser than max, then no issues (range is valid)
         return Integer.parseInt(min.get()) < Integer.parseInt(max.get());
+    }
+
+    private BatteriesListResponse makeBatteriesListResponse(List<BatteryDto> batteries) {
+        int batteriesCount = batteries.size();
+        int totalCapacity = batteries.stream().mapToInt(BatteryDto::getCapacity).sum();
+        List<String> batteryNames = batteries.stream().map(BatteryDto::getName).toList();
+
+        BatteriesListResponse response = new BatteriesListResponse();
+        response.setCount(batteriesCount);
+        response.setTotalCapacity(totalCapacity);
+        response.setAverageCapacity(batteriesCount > 0 ? totalCapacity / batteriesCount : 0);
+        response.setBatteries(batteryNames);
+
+        return response;
     }
 }

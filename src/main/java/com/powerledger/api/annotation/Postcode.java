@@ -1,16 +1,11 @@
 package com.powerledger.api.annotation;
 
 import jakarta.validation.Constraint;
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.ElementType.TYPE_USE;
 
 /**
  * The annotated {@code CharSequence} must match the
