@@ -1,8 +1,12 @@
 package com.powerledger.api.controller;
 
 
-import com.powerledger.api.model.Battery;
-import com.powerledger.api.model.BatteryData;
+import com.powerledger.api.dto.BatteryDto;
+import com.powerledger.api.service.BatteryService;
+import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -14,46 +18,34 @@ import java.util.UUID;
 @RestController
 @EnableWebMvc
 public class BatteriesController {
-    @RequestMapping(path = "/batteries", method = RequestMethod.POST)
-    public Battery createBattery(@RequestBody Battery newBattery) {
-        if (newBattery.getName() == null || newBattery.getPostcode() == null) {
-            return null;
-        }
+    private final BatteryService batteryService;
+    private static final Logger log = LogManager.getLogger();
 
-        Battery dbBattery = newBattery;
-        dbBattery.setId(UUID.randomUUID().toString());
-        return dbBattery;
+    public BatteriesController(BatteryService batteryService) {
+        this.batteryService = batteryService;
     }
 
-    @RequestMapping(path = "/batteries", method = RequestMethod.GET)
-    public Battery[] listBatteries(@RequestParam("limit") Optional<Integer> limit, Principal principal) {
-        int queryLimit = 10;
-        if (limit.isPresent()) {
-            queryLimit = limit.get();
-        }
+    @PostMapping("/batteries")
+    ResponseEntity<BatteryDto> createBattery(@Valid @RequestBody BatteryDto battery) {
+        var createdBattery = batteryService.CreateBattery(battery);
 
-        Battery[] outputBatteries = new Battery[queryLimit];
-
-        for (int i = 0; i < queryLimit; i++) {
-            Battery newBattery = new Battery();
-            newBattery.setId(UUID.randomUUID().toString());
-            newBattery.setName(BatteryData.getRandomName());
-            newBattery.setPostcode(BatteryData.getRandomPostcode());
-            newBattery.setCapacity(BatteryData.getRandomCapacity());
-            outputBatteries[i] = newBattery;
-        }
-
-        return outputBatteries;
+        log.info("Successfully created a Battery record");
+        return ResponseEntity.ok(createdBattery);
     }
 
-    @RequestMapping(path = "/batteries/{batteryId}", method = RequestMethod.GET)
-    public Battery listPets(@PathVariable String batteryId) {
-        Battery newBattery = new Battery();
-        newBattery.setId(UUID.randomUUID().toString());
-        newBattery.setName(BatteryData.getRandomName());
-        newBattery.setPostcode(BatteryData.getRandomPostcode());
-        newBattery.setCapacity(BatteryData.getRandomCapacity());
-        return newBattery;
+    @GetMapping("/batteries")
+    ResponseEntity<Iterable<BatteryDto>> listBatteries(@RequestParam("limit") Optional<Integer> limit, Principal principal) {
+        var batteries = batteryService.ListBatteries();
+
+        log.info("Successfully fetched a Batteries list");
+        return ResponseEntity.ok(batteries);
     }
 
+    @GetMapping("/batteries/{batteryId}")
+    ResponseEntity<BatteryDto> getBattery(@PathVariable UUID batteryId) {
+        var battery = batteryService.GetBattery(batteryId);
+
+        log.info("Successfully fetched a Battery");
+        return ResponseEntity.ok(battery);
+    }
 }

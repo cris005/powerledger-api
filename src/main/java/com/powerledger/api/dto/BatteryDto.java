@@ -1,35 +1,29 @@
-package com.powerledger.api.model;
+package com.powerledger.api.dto;
 
 
-import com.powerledger.api.dto.BatteryDto;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Entity
-@Table(name = "batteries")
-public class Battery {
-    public Battery() {}
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class BatteryDto {
     private UUID id;
-    @Column(name = "postcode", nullable = false)
+
+    @Pattern(
+            regexp = "(0[289][0-9]{2})|([1-9][0-9]{3})",
+            message = "Postcode must fall within the following ranges: 0200-0299, 0800-0999 and 1000-9999"
+    )
     private String postcode;
-    @Column(name = "name", nullable = false)
+
+    @NotBlank(message="Name cannot be blank")
     private String name;
-    @Column(name = "capacity", nullable = false)
+
+    @Min(value = 0, message = "Capacity must be greater than 0")
     private Integer capacity;
-    @Column(name = "created_at")
-    @CreationTimestamp
+
     private Instant createdAt;
-    @Column(name = "updated_at")
-    @UpdateTimestamp
     private Instant updatedAt;
 
     public UUID getId() {
@@ -82,16 +76,5 @@ public class Battery {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public BatteryDto asDto()
-    {
-        BatteryDto dto = new BatteryDto();
-        dto.setId(this.id);
-        dto.setName(this.name);
-        dto.setCapacity(this.capacity);
-        dto.setPostcode(this.postcode);
-
-        return dto;
     }
 }
