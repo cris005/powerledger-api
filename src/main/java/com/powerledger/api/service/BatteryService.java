@@ -35,8 +35,8 @@ public class BatteryService {
 
     }
 
-    public Iterable<BatteryDto> ListBatteries() {
-        var batteries = this.batteryRepository.findAll();
+    public Iterable<BatteryDto> ListBatteries(String min, String max) {
+        var batteries = this.batteryRepository.findAllByPostcodeBetweenOrderByNameAsc(min, max);
 
         var batteryDtoList = new ArrayList<BatteryDto>();
 

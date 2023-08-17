@@ -1,8 +1,10 @@
 package com.powerledger.api.controller;
 
 
+import com.powerledger.api.annotation.Postcode;
 import com.powerledger.api.dto.BatteryDto;
 import com.powerledger.api.service.BatteryService;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import org.apache.logging.log4j.LogManager;
@@ -12,11 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @RestController
@@ -45,8 +43,31 @@ public class BatteriesController {
     }
 
     @GetMapping("/batteries")
-    ResponseEntity<Iterable<BatteryDto>> listBatteries(@RequestParam("limit") Optional<Integer> limit, Principal principal) {
-        var batteries = batteryService.ListBatteries();
+    ResponseEntity<Iterable<BatteryDto>> listBatteries(
+            @RequestParam("minPostcode") Optional<@Postcode(optional = true) String> minPostcode,
+            @RequestParam("maxPostcode") Optional<@Postcode(optional = true) String> maxPostcode) {
+
+        if (!isPostcodeRangeValid(minPostcode, maxPostcode)) {
+            throw new ConstraintViolationException("Min. postcode must be lesser than max postcode", null);
+        }
+
+        var batteries = batteryService.ListBatteries(
+                minPostcode.orElse("0"),
+                maxPostcode.orElse("9999")
+        );
+
+        int totalBatteries = 0;
+        int totalCapacity = 0;
+        for (BatteryDto battery : batteries)
+        {
+            totalCapacity += battery.getCapacity();
+            totalBatteries++;
+        }
+        log.info("Count: " + totalBatteries);
+        log.info("Total capacity: " + totalCapacity);
+
+        int averageCapacity = totalCapacity / totalBatteries;
+        log.info("Average capacity: " + averageCapacity);
 
         log.info("Successfully fetched a Batteries list");
         return ResponseEntity.ok(batteries);
@@ -58,5 +79,17 @@ public class BatteriesController {
 
         log.info("Successfully fetched a Battery");
         return ResponseEntity.ok(battery);
+    }
+
+    private boolean isPostcodeRangeValid(Optional<String> min, Optional<String> max) {
+        boolean bothExist = min.isPresent() && max.isPresent();
+
+        // Only 1 end of the range provided, so no conflicts
+        if (!bothExist) {
+            return true;
+        }
+
+        // If min is lesser than max, then no issues (range is valid)
+        return Integer.parseInt(min.get()) < Integer.parseInt(max.get());
     }
 }
