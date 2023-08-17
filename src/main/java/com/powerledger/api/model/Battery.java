@@ -5,8 +5,6 @@ import com.powerledger.api.dto.BatteryDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -91,6 +89,8 @@ public class Battery {
         dto.setName(this.name);
         dto.setCapacity(this.capacity);
         dto.setPostcode(this.postcode);
+        dto.setCreatedAt(this.createdAt);
+        dto.setUpdatedAt(this.updatedAt);
 
         return dto;
     }
