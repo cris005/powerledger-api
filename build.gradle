@@ -1,0 +1,47 @@
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '3.1.2'
+  id 'io.spring.dependency-management' version '1.1.2'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+java {
+  sourceCompatibility = '17'
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  maven {url "https://repo.spring.io/milestone"}
+  maven {url "https://repo.spring.io/snapshot"}
+}
+
+dependencies {
+  implementation (
+      /*implementation('org.springframework.boot:spring-boot-starter-web:3.1.2') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+      },*/
+      implementation('org.springframework.boot:spring-boot-starter-web:3.1.2'),
+      'com.amazonaws.serverless:aws-serverless-java-container-springboot3:[2.0-SNAPSHOT,)',
+  )
+  //implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+  //runtimeOnly 'org.postgresql:postgresql'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+task buildZip(type: Zip) {
+  from compileJava
+  from processResources
+  into('lib') {
+    from(configurations.compileClasspath) {
+      exclude 'tomcat-embed-*'
+    }
+  }
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+}
+
+build.dependsOn buildZip
