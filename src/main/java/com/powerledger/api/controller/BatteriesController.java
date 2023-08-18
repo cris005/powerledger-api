@@ -2,6 +2,7 @@ package com.powerledger.api.controller;
 
 import com.powerledger.api.annotation.Postcode;
 import com.powerledger.api.dto.BatteryDto;
+import com.powerledger.api.exception.ResourceNotFoundException;
 import com.powerledger.api.response.BatteriesListResponse;
 import com.powerledger.api.service.BatteryService;
 import jakarta.validation.ConstraintViolationException;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
 import java.util.*;
 
 @RestController
@@ -61,8 +61,13 @@ public class BatteriesController {
     }
 
     @GetMapping("/batteries/{batteryId}")
-    ResponseEntity<BatteryDto> getBattery(@PathVariable UUID batteryId) {
+    ResponseEntity<BatteryDto> getBattery(@PathVariable UUID batteryId) throws ResourceNotFoundException {
         var battery = batteryService.GetBattery(batteryId);
+
+        if (battery == null) {
+            log.info("Battery not found");
+            throw new ResourceNotFoundException("The ID provided does not belong to an existing Battery");
+        }
 
         log.info("Successfully fetched a Battery");
         return ResponseEntity.ok(battery);

@@ -1,4 +1,4 @@
-package com.powerledger.api.controller;
+package com.powerledger.api.exception;
 
 import java.util.Date;
 
