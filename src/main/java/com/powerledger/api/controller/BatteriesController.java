@@ -32,10 +32,10 @@ public class BatteriesController {
             @RequestBody @NotEmpty(message = "List cannot be empty") List<@Valid BatteryDto> batteries) {
         List<UUID> batteryIds = new ArrayList<UUID>();
 
-        for (BatteryDto battery : batteries) {
-            var createdBattery = batteryService.CreateBattery(battery);
+        batteries.forEach(batteryDto -> {
+            BatteryDto createdBattery = batteryService.CreateBattery(batteryDto);
             batteryIds.add(createdBattery.getId());
-        }
+        });
 
         log.info("Successfully created Battery records");
         return ResponseEntity.ok(batteryIds);
@@ -88,6 +88,7 @@ public class BatteriesController {
         BatteriesListResponse response = new BatteriesListResponse();
         response.setCount(batteriesCount);
         response.setTotalCapacity(totalCapacity);
+        // Must default to 0, else this will try divide by 0 and throw errors
         response.setAverageCapacity(batteriesCount > 0 ? totalCapacity / batteriesCount : 0);
         response.setBatteries(batteryNames);
 

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: PowerLedger API written with SpringBoot and served on AWS Lambda
+Description: PowerLedger API written with SpringBoot 3 and served on AWS Lambda
 
 Globals:
   Api:
@@ -11,6 +11,13 @@ Resources:
   PowerLedgerApiFunction:
     Type: AWS::Serverless::Function
     Properties:
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-0c4c046bf834c891d
+        SubnetIds:
+          - subnet-052a00c614d24b52b
+          - subnet-014b067e9e82addf1
+          - subnet-06313a246e74fc3df
       Handler: com.powerledger.api.StreamLambdaHandler::handleRequest
       Runtime: java17
       CodeUri: .
