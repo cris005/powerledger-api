@@ -1,7 +1,7 @@
 # PowerLedger API hosted in AWS Lambda
 A basic battery management application written with the [Spring Boot 3 framework](https://projects.spring.io/spring-boot/).
 
-The application can be deployed in an AWS account using the [Serverless Application Model](https://github.com/awslabs/serverless-application-model).
+The application can be deployed to an AWS account using the [Serverless Application Model](https://github.com/awslabs/serverless-application-model).
 The `template.yml` file in the root folder contains the application definition.
 
 The `StreamLambdaHandler` object is the main entry point for Lambda.
@@ -64,4 +64,90 @@ PowerLedgerApi - URL for application            https://xxxxxxxxxx.execute-api.u
 ---------------------------------------------------------------------------------------------------------
 
 $ curl https://xxxxxxxxxx.execute-api.us-west-2.amazonaws.com/batteries
+```
+
+## API Endpoints
+
+### Create new batteries
+
+#### Request
+```http request
+POST http://localhost:8080/batteries
+
+Content-Type: application/json
+Accept: application/json
+```
+#### Request body
+```json
+[
+  {
+    "name": "Cannington",
+    "postcode": "6107",
+    "capacity": 13500
+  },
+  {
+    "name": "Midland",
+    "postcode": "6057",
+    "capacity": 50500
+  }
+]
+```
+
+#### Response
+```json
+[
+    "ac861922-32df-4fec-8f20-5f66ad8b3159",
+    "e9b88a2c-a537-4b64-86ab-c28c96d6696a"
+]
+```
+
+### Fetch many batteries and analytics
+
+#### Request
+
+Please note that both `minPostcode` and `maxPostcode` parameters are optional.
+
+```http request
+GET http://localhost:8080/batteries?minPostcode={value}&maxPostcode={value}
+
+Accept: application/json
+```
+
+#### Response
+```json
+{
+    "count": 7,
+    "totalCapacity": 176000,
+    "averageCapacity": 25142,
+    "batteries": [
+        "Akunda Bay",
+        "Hay Street",
+        "Kent Town",
+        "Norfolk Island",
+        "Ootha",
+        "University of Melbourne",
+        "Werrington County"
+    ]
+}
+```
+
+### Fetch a specific battery
+
+#### Request
+```http request
+GET http://localhost:8080/batteries/{batteryId}
+
+Accept: application/json
+```
+
+#### Response
+```json
+{
+  "id": "e9209313-0d86-4263-9b62-0b3ae4f7711a",
+  "postcode": "6107",
+  "name": "Cannington",
+  "capacity": 13500,
+  "createdAt": "2023-08-18T06:51:06.954978Z",
+  "updatedAt": "2023-08-18T06:51:06.955047Z"
+}
 ```

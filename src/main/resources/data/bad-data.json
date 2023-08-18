@@ -1,0 +1,17 @@
+[
+  {
+    "name": "",
+    "postcode": "6107",
+    "capacity": 13500
+  },
+  {
+    "name": "Midland",
+    "postcode": "60570",
+    "capacity": 50500
+  },
+  {
+    "name": "Hay Street",
+    "postcode": "6000",
+    "capacity": -23500
+  }
+]

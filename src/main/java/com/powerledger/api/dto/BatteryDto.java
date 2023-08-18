@@ -63,7 +63,7 @@ public class BatteryDto {
     }
 
     public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt.toString();
+        this.createdAt = createdAt == null ? "" : createdAt.toString();
     }
 
     public String getUpdatedAt() {
@@ -71,6 +71,6 @@ public class BatteryDto {
     }
 
     public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt.toString();
+        this.updatedAt = updatedAt == null ? "" : updatedAt.toString();
     }
 }
